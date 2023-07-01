@@ -176,10 +176,10 @@ public class Main{
             if (rowsAffected > 0) {
                 System.out.println("Product added to Table successfully.");
             } else {
-                System.out.println("Failed to add the product to Agent.");
+                System.out.println("Failed to add the product to Table.");
             }
         } catch (SQLException e) {
-            System.out.println("Error adding product to Agent: " + e.getMessage());
+            System.out.println("Error adding product to Table: " + e.getMessage());
         }
     }
 
@@ -204,7 +204,7 @@ public class Main{
                 System.out.println("-------------------------");
             }
         } catch (SQLException e) {
-            System.out.println("Error viewing Agent table records: " + e.getMessage());
+            System.out.println("Error viewing table records: " + e.getMessage());
         }
     }
 private static void productSell(Connection conn) {
