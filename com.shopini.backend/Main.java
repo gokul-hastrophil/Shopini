@@ -195,12 +195,12 @@ public class Main{
                 int minimum_sellquantity = resultSet.getInt("minimum_sellquantity");
                 double price = resultSet.getDouble("price");
                 int quantity = resultSet.getInt("quantity");
-
-                System.out.println("Product ID: " + pid);
-                System.out.println("Product Name: " + pname);
-                System.out.println("Product Minimum sell Quantity: " + minimum_sellquantity);
-                System.out.println("Product Price: " + price);
-                System.out.println("Product Quantity: " + quantity);
+                System.out.println("\nProductID" +" | "+"ProductName" +" | "+"ProductPrice" +" | "+"ProductQuantity");
+                System.out.println(pid +" | "+pname +" | "+price +" | "+quantity);
+                // System.out.println("Product Name: " + pname);
+                // System.out.println("Product Minimum sell Quantity: " + minimum_sellquantity);
+                // System.out.println("Product Price: " + price);
+                // System.out.println("Product Quantity: " + quantity);
                 System.out.println("-------------------------");
             }
         } catch (SQLException e) {
