@@ -50,6 +50,7 @@ Make sure to update the following configuration details in the code:
 
 ## Demo
 
+![ezgif com-video-to-gif](https://github.com/gokul-hastrophil/Shopini/assets/65296673/bfc11550-e37c-4b70-b2ad-355ff2ce100d)
 
 
 
