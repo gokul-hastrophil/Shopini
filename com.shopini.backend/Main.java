@@ -1,13 +1,13 @@
 import java.sql.*;
-import java.util.*;
+import java.util.Scanner;
 
-public class Main{
+public class Main {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/shopini";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "Gokul@#63808";
 
     public static void main(String[] args) {
-         Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
 
         try {
             // Establish the database connection
@@ -18,7 +18,7 @@ public class Main{
                 System.out.println("Welcome to the Shopping Bill Website");
                 System.out.println("1. Login as Admin");
                 System.out.println("2. Login as Agent");
-                System.out.println("3. LogOut");
+                System.out.println("3. Logout");
                 System.out.print("Enter your choice: ");
                 int choice = scanner.nextInt();
 
@@ -44,9 +44,6 @@ public class Main{
         }
     }
 
-
-    
-
     private static void loginAsAdmin(Connection conn) {
         Scanner scanner = new Scanner(System.in);
 
@@ -65,7 +62,7 @@ public class Main{
 
             if (resultSet.next()) {
                 System.out.println("Admin login successful!");
-                 while (true) {
+                while (true) {
                     System.out.println("Admin Menu");
                     System.out.println("1. Add Product to Agent");
                     System.out.println("2. View Product Table Records");
@@ -128,7 +125,7 @@ public class Main{
                             addProductToTable(conn);
                             break;
                         case 2:
-                            productSell(conn);
+                            buyProduct(conn);
                             break;
                         case 3:
                             System.out.println("Agent logged out.");
@@ -147,7 +144,7 @@ public class Main{
         }
     }
 
-  private static void addProductToTable(Connection conn) {
+    private static void addProductToTable(Connection conn) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Add Product");
@@ -164,7 +161,7 @@ public class Main{
         int quantity = scanner.nextInt();
 
         try {
-            String query = "INSERT INTO Product (pid, pname,minimum_sellquantity, price, quantity) VALUES (?, ?, ?, ?, ?)";
+            String query = "INSERT INTO Product (pid, pname, minimum_sellquantity, price, quantity) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setInt(1, pid);
             statement.setString(2, pname);
@@ -188,45 +185,62 @@ public class Main{
             String query = "SELECT * FROM Product";
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
-
+            System.out.println("\nProductID" + " | " + "ProductName" + " | " + "ProductPrice" + " | " + "ProductQuantity");
             while (resultSet.next()) {
                 int pid = resultSet.getInt("pid");
                 String pname = resultSet.getString("pname");
                 int minimum_sellquantity = resultSet.getInt("minimum_sellquantity");
                 double price = resultSet.getDouble("price");
                 int quantity = resultSet.getInt("quantity");
-                System.out.println("\nProductID" +" | "+"ProductName" +" | "+"ProductPrice" +" | "+"ProductQuantity");
-                System.out.println(pid +" | "+pname +" | "+price +" | "+quantity);
-                // System.out.println("Product Name: " + pname);
-                // System.out.println("Product Minimum sell Quantity: " + minimum_sellquantity);
-                // System.out.println("Product Price: " + price);
-                // System.out.println("Product Quantity: " + quantity);
+                //System.out.println("\nProductID" + " | " + "ProductName" + " | " + "ProductPrice" + " | " + "ProductQuantity");
+                System.out.println(pid + " | " + pname + " | " + price + " | " + quantity);
                 System.out.println("-------------------------");
             }
         } catch (SQLException e) {
             System.out.println("Error viewing table records: " + e.getMessage());
         }
     }
-private static void productSell(Connection conn) {
-    Scanner scanner = new Scanner(System.in);
-    System.out.println("Enter the Product Id");
-    int pid = scanner.nextInt();
-    System.out.println("Enter the Number of Quantity that You Want TO Buy");
-    int buyQuantity = scanner.nextInt();
-    try {
-        String query = "SELECT price FROM Product WHERE pid = ?";
-        PreparedStatement statement = conn.prepareStatement(query);
-        statement.setInt(1, pid);
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            int price = resultSet.getInt("price");
-            System.out.println("Your Total Product Cost is RS." + price * buyQuantity);
-        } else {
-            System.out.println("Invalid product Id");
-        }
-    } catch (SQLException e) {
-        System.out.println("Error during product sell: " + e.getMessage());
-    }
-}
 
+    private static void buyProduct(Connection conn) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the Product ID: ");
+        int pid = scanner.nextInt();
+        System.out.print("Enter the Number of Quantity to Buy: ");
+        int buyQuantity = scanner.nextInt();
+
+        try {
+            String selectQuery = "SELECT quantity, price FROM Product WHERE pid = ?";
+            PreparedStatement selectStatement = conn.prepareStatement(selectQuery);
+            selectStatement.setInt(1, pid);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int quantity = resultSet.getInt("quantity");
+                double price = resultSet.getDouble("price");
+
+                if (quantity >= buyQuantity) {
+                    double totalCost = price * buyQuantity;
+                    System.out.println("Your Total Product Cost is RS." + totalCost);
+
+                    String updateQuery = "UPDATE Product SET quantity = ? WHERE pid = ?";
+                    PreparedStatement updateStatement = conn.prepareStatement(updateQuery);
+                    updateStatement.setInt(1, quantity - buyQuantity);
+                    updateStatement.setInt(2, pid);
+                    int rowsAffected = updateStatement.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        System.out.println("Product quantity updated successfully.");
+                    } else {
+                        System.out.println("Failed to update product quantity.");
+                    }
+                } else {
+                    System.out.println("Insufficient quantity available for purchase.");
+                }
+            } else {
+                System.out.println("Invalid product ID.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error during product purchase: " + e.getMessage());
+        }
+    }
 }
